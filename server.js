@@ -1,0 +1,73 @@
+const express = require('express');
+const cors = require('cors');
+const fs = require('fs');
+const csv = require('csv-parser');
+const kmeans = require('./kmeans');
+
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+app.get('/OLDdata', (req, res) => {
+    const results = [];
+    fs.createReadStream('csvfile.csv')
+        .pipe(csv())
+        .on('data', (data) => results.push(data))
+        .on('end', () => {
+            res.json(results);
+        });
+});
+
+
+app.get('/data', (req, res) => {
+    const results = [];
+    fs.createReadStream('csvfile.csv')
+        .pipe(csv())
+        .on('data', (data) => {
+            // Transform the data into the expected format
+            results.push({ 
+                x: parseFloat(data.A), 
+                y: parseFloat(data.B), 
+                z: parseFloat(data.C) 
+            });
+        })
+        .on('end', () => {
+            res.json(results);
+        });
+});
+
+
+
+
+
+app.post('/cluster-data', (req, res) => {
+    try {
+        const data = req.body;
+
+        console.log("Data received at backend for clustering:", data);
+
+
+        if (!Array.isArray(data) || data.length === 0) {
+            throw new Error('Data is empty or not in expected format');
+        }
+
+        const clusteredData = kmeans(data);
+
+        console.log("Clustered data (including centroids):", clusteredData); 
+        res.json(clusteredData);
+    } catch (error) {
+        console.error('Error in clustering data:', error);
+        res.status(500).send('Error in clustering data');
+    }
+});
+
+
+
+
+
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
+
