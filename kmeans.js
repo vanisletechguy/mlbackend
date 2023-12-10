@@ -1,5 +1,4 @@
 // kmeans.js
-
 const K_VALUE = 2;
 const MAX_ITERATIONS = 1000;
 const NUMBER_OF_POINTS = 50;
@@ -7,6 +6,9 @@ const NUMBER_OF_POINTS = 50;
 let centroids = new Array(K_VALUE);
 let allData = new Array(NUMBER_OF_POINTS);
 
+////////////////////////////////////////////////////////////////////////////////
+// initializeCentroids
+////////////////////////////////////////////////////////////////////////////////
 function initializeCentroids() {
 
     if (allData.length < 34) {
@@ -17,6 +19,9 @@ function initializeCentroids() {
     centroids[1] = allData[33];
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// getDistance
+////////////////////////////////////////////////////////////////////////////////
 function getDistance(index, centNum) {
     const point = allData[index];
     const centroid = centroids[centNum];
@@ -28,6 +33,9 @@ function getDistance(index, centNum) {
     return Math.sqrt(x + y + z);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// assignPoints
+////////////////////////////////////////////////////////////////////////////////
 function assignPoints() {
     let sums = Array(K_VALUE).fill().map(() => ({ x: 0, y: 0, z: 0, count: 0 }));
 
@@ -41,9 +49,7 @@ function assignPoints() {
                 closestCentroid = centNum;
             }
         }
-
         allData[index].clusterId = closestCentroid;
-
         sums[closestCentroid].x += allData[index].x;
         sums[closestCentroid].y += allData[index].y;
         sums[closestCentroid].z += allData[index].z;
@@ -63,15 +69,18 @@ function assignPoints() {
             }
         }
     }
-
     return !centroidsMoved;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// kmeans
+////////////////////////////////////////////////////////////////////////////////
 function kmeans(data) {
     allData = data; // Assuming data is an array of {x, y, z} objects
-    console.log("kmeans loaded data is: ", data);
-    allData = data.map(d => ({ x: parseFloat(d.A), y: parseFloat(d.B), z: parseFloat(d.C) }));
-    console.log("kmeans transformed data is: ", data);
+    //console.log("kmeans loaded data is: ", data);
+    allData = data.map(d => ({ x: parseFloat(d.x), y: parseFloat(d.y), z: parseFloat(d.z) }));
+    //allData = data.map(d => ({ x: parseFloat(d.A), y: parseFloat(d.B), z: parseFloat(d.C) }));
+    //console.log("kmeans transformed data is: ", data);
 
     initializeCentroids();
 
