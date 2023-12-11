@@ -45,22 +45,27 @@ app.get('/data', (req, res) => {
 ////////////////////////////////////////////////////////////////////////////////
 // POST:    /cluster-data
 ////////////////////////////////////////////////////////////////////////////////
+//
 app.post('/cluster-data', (req, res) => {
     try {
-        const data = req.body;
-        //console.log("Data received at backend for clustering:", data);
+        const { data, K } = req.body;
+
         if (!Array.isArray(data) || data.length === 0) {
             throw new Error('Data is empty or not in expected format');
         }
-        const clusteredData = kmeans(data);
-        console.log("Clustered data (including centroids):", clusteredData); 
+
+        // Check if K is provided and a number; if not, pass undefined
+        const specificK = (typeof K === 'number') ? K : undefined;
+
+        const clusteredData = kmeans(data, specificK);
+        console.log("Clustered data (including centroids):", clusteredData);
         res.json(clusteredData);
+
     } catch (error) {
         console.error('Error in clustering data:', error);
         res.status(500).send('Error in clustering data');
     }
 });
-
 
 ////////////////////////////////////////////////////////////////////////////////
 const PORT = process.env.PORT || 3001;
